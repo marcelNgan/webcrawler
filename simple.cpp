@@ -14,10 +14,10 @@ using namespace curlpp;
 void dumphrefs(node &node, list<string> *dst);
 static int writer(char *data, size_t size, size_t nmemb, buffer *dst);
  
-int main(int argc, char *argv[])
+list<string> extractor(string url)
 {
-    string url = "";
-    list<string> links; // list of links
+    char *urlCharArray = new char[url.size()+1];    
+    list<string> links;  // list of links from the site
 	
     //used for downloading the page with curl and parsing the page with tidy
     document doc; // tidy html document
@@ -25,9 +25,6 @@ int main(int argc, char *argv[])
     buffer errbuf; // will store the warnings and errors encountered by html tidy
     node root; // will store the root node of the document
 	
-    cout << "Please enter the page you wish to crawl" << endl;
-    getline(cin, url);
-    char *urlCharArray = new char[url.size()+1];
     urlCharArray[url.size()] = 0;
     memcpy(urlCharArray,url.c_str(), url.size());
 	
@@ -48,13 +45,15 @@ int main(int argc, char *argv[])
         if (http_status != 200)
         {
             cerr << "Expecting HTTP 200 OK, got " << http_status << endl;
-            return 1;
+            links.clear();
+            return links;
         }
     }
     catch (const curlpp::exception &e) // catch exceptions and print the error on screen
     {
         cerr << e.what() << endl;
-        return 1;
+        links.clear();
+        return links;
     }
  
     // parser
@@ -69,31 +68,12 @@ int main(int argc, char *argv[])
     catch (const tidypp::exception &e) // catch exceptions and print the error on screen
     {
         cerr << e.what() << endl;
-        return 1;
+        links.clear();
+        return links;
     }
  
     root = doc.root(); // get root node
     dumphrefs(root, &links); // dump links to our list
- 
-    // if the list is empty...
-    if (!links.size())
-    {
-        cerr << "No links found!" << endl;
-        return 1;
-    }
- 
-    cout << "There are " << links.size() << " links:" << endl;
- 
-    // iterate the links list
-    for (list<string>::iterator it = links.begin(); it != links.end(); it++)
-        cout << *it << endl;
-    
-    cout << "Finish" << endl;
- 
-    // note: the error buffer is never used in this example, but it's important to set it because
-    // tidy html would dump all the errors in stdout otherwise.
- 
-    return 0;
 }
  
 /**
