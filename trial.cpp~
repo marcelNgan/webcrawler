@@ -1,0 +1,79 @@
+include <iostream>
+#include <fstream>
+#include <cstring>
+#include <errno.h>
+#include <curlplusplus/easy.hpp>
+
+static int writer(char *data, size_t size, size_t nmemb, std::ofstream *dst);
+ 
+int main(int argc, char *argv[])
+{
+    if (argc != 3)
+    {
+        std::cerr << "Usage: " << argv[0] << " <URL> <Destination Filename>" << std::endl;
+        return 1;
+    }
+ 
+    try
+    {
+        curlpp::easy curl;
+        std::ofstream file;
+        const char *filename = argv[2];
+        long http_status;
+ 
+        std::cout << "Preparing file..." << std::endl;
+        file.open(filename);
+ 
+        if (!file)
+        {
+            std::cerr << "Failed to open file: " << strerror(errno) << std::endl;
+            return 1;
+        }
+ 
+        std::cout << "Setting cURL options..." << std::endl;
+        curl.setopt(CURLOPT_URL, argv[1]); // assign URL
+        curl.setopt(CURLOPT_FOLLOWLOCATION, 1);
+        curl.setopt(CURLOPT_WRITEFUNCTION, writer); // assign write callback
+        curl.setopt(CURLOPT_WRITEDATA, &file); // assign write buffer (our file)
+ 
+        std::cout << "Performing cURL..." << std::endl;
+        curl.perform();
+        curl.getinfo(CURLINFO_RESPONSE_CODE, &http_status);
+        std::cout << "Success with code " << http_status << "!" << std::endl;
+ 
+        file.close();
+        std::cout << "Written to file " << filename << std::endl;
+    }
+    catch (const curlpp::exception &e)
+    {
+        std::cerr << e.what() << std::endl;
+        return 1;
+    }
+ 
+    return 0;
+}
+ 
+/**
+* Write callback called by cURL every time it obtains some data.
+*
+* @param[in] data the data that has just been obtained.
+* @param size the size of each data block.
+* @param nmemb the number of data blocks. multiply this by size to obtain the
+*              total size of data.
+* @param[out] dst the destination buffer that was assigned to CURLOPT_WRITEDATA
+* [USER=16172]Return[/USER] the amount of bytes that were dispatched to the destination buffer.
+*/
+static int writer(char *data, size_t size, size_t nmemb, std::ofstream *dst)
+{
+    size_t len;
+ 
+    if (!data)
+        return 0;
+ 
+    len = size * nmemb;
+ 
+    if (dst->write(data, len))
+        return len; // must return the amount of written bytes
+ 
+    return 0;
+}
