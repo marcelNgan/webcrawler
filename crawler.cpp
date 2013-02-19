@@ -9,18 +9,25 @@
 #include <string>
 #include "simple.cpp"
 
-list<string> extractor(string url)
+list<string> extractor(string url);
 void linksprinter (list<string> links);
 
 int main(int argc, char *argv[])
 {
     string url = "";  //url of the site
     list<string> links;  // list of links from the site
-    
-    cout << "Please enter the page you wish to crawl" << endl;
-    getline(cin, url);
-    links = extractor(url);
-    linksprinter(links);
+    char cont = 'Y';
+    while (cont == 'Y')
+    {
+        cout << "Please enter the page you wish to crawl" << endl;
+        cin >> url;
+        cout << "Crawling: " << url << endl;
+        links = extractor(url);
+        linksprinter(links);
+        cout << "Do you wish to crawl another site? (Y|N)";
+        cin >> cont;
+    }
+    return 1;
 }
 
 void linksprinter (list<string> links)

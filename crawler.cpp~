@@ -16,11 +16,18 @@ int main(int argc, char *argv[])
 {
     string url = "";  //url of the site
     list<string> links;  // list of links from the site
-    
-    cout << "Crawler: Please enter the page you wish to crawl" << endl;
-    getline(cin, url);
-    links = extractor(url);
-    linksprinter(links);
+    char cont = 'Y';
+    while (cont == 'Y')
+    {
+        cout << "Please enter the page you wish to crawl" << endl;
+        cin >> url
+        cout << "Crawling: " << url << endl;
+        links = extractor(url);
+        linksprinter(links);
+        cout << "Do you wish to crawl another site? (Y|N)";
+        cin >> cont;
+    }
+    return 1;
 }
 
 void linksprinter (list<string> links)
@@ -35,6 +42,6 @@ void linksprinter (list<string> links)
     cout << "There are " << links.size() << " links:" << endl;
  
     // iterate the links list
-    for (list<string>::iterator it = git links.begin(); it != links.end(); it++)
+    for (list<string>::iterator it = links.begin(); it != links.end(); it++)
         cout << *it << endl;
 }
