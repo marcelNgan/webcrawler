@@ -8,9 +8,11 @@
 #include <iostream>
 
 using namespace std;
+using namespace tidypp;
+using namespace curlpp;
 
-void dumphrefs(tidypp::node &node, std::list<std::string> *dst);
-static int writer(char *data, size_t size, size_t nmemb, tidypp::buffer *dst);
+void dumphrefs(node &node, list<string> *dst);
+static int writer(char *data, size_t size, size_t nmemb, buffer *dst);
  
 int main(int argc, char *argv[])
 {
@@ -18,10 +20,10 @@ int main(int argc, char *argv[])
     list<string> links; // list of links
 	
     //used for downloading the page with curl and parsing the page with tidy
-    tidypp::document doc; // tidy html document
-    tidypp::buffer html; // will store our html code
-    tidypp::buffer errbuf; // will store the warnings and errors encountered by html tidy
-    tidypp::node root; // will store the root node of the document
+    document doc; // tidy html document
+    buffer html; // will store our html code
+    buffer errbuf; // will store the warnings and errors encountered by html tidy
+    node root; // will store the root node of the document
 	
     cout << "Please enter the page you wish to crawl" << endl;
     getline(cin, url);
@@ -32,7 +34,7 @@ int main(int argc, char *argv[])
     // taken from the curlplusplus example
     try
     {
-        curlpp::easy curl; // handle to the curl easy interface
+        easy curl; // handle to the curl easy interface
         long http_status; // will store the result of the curl request
  
         cout << "Obtaining page..." << endl;
@@ -101,17 +103,17 @@ int main(int argc, char *argv[])
 * @param[in] node the root node of the document.
 * @param[out] dst the destination array of strings.
 */
-void dumphrefs(tidypp::node &node, list<string> *dst)
+void dumphrefs(node &node, list<string> *dst)
 {
     // iterate all children nodes
     for (tidypp::node child = node.child(); child.valid(); child = child.next())
     {
-        tidypp::tagid id = node.id(); // obtain tag id to check if it's a link
+        tagid id = node.id(); // obtain tag id to check if it's a link
  
         // if the node is an <a> tag...
         if (id == TidyTag_A)
         {
-            tidypp::attribute href = node.attrgetbyid(TidyAttr_HREF); // get the href attribute
+            attribute href = node.attrgetbyid(TidyAttr_HREF); // get the href attribute
             ctmbstr hrefval = href.value(); // the string of the actual link
  
             if (hrefval) // if the link is not empty...
@@ -137,7 +139,7 @@ void dumphrefs(tidypp::node &node, list<string> *dst)
 *
 * [USER=16172]Return[/USER] the amount of bytes that were dispatched to the destination buffer.
 */
-static int writer(char *data, size_t size, size_t nmemb, tidypp::buffer *dst)
+static int writer(char *data, size_t size, size_t nmemb, buffer *dst)
 {
     size_t len;
  
