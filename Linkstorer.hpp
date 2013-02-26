@@ -7,11 +7,13 @@ using namespace std;
 
 class Linkstorer
 {
+    string parentURL;
     string url;
     list<string> links;
 public:
     void printLink ();
-    Linkstorer(string url);
+    list<string> getLinks();
+    Linkstorer(string url, string parentURL);
     ~Linkstorer();
 };
 #endif
