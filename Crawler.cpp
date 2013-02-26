@@ -33,22 +33,46 @@ int main(int argc, char *argv[])
         cout << "Do you wish to crawl another site? (Y|N)";
         cin >> cont;
     }
+    ofstream crawlFile;
+    crawlFile.open("crawl.txt", ios::app);
+    crawlFile << "Total links crawled: " << allURL.size() << endl;
+    for (vector<string>::iterator it = allURL.begin(); it != allURL.end(); it++)
+            crawlFile << *it << endl;
     return 1;
 }
 
 void crawling (string url, int level)
 {
-    string parent  = "NULL";
     list<string> links;             // list of links from the site
-    if (std::find(allURL.begin(), allURL.end(), url) == allURL.end())
+    list<string> tempLinks;         // list of all the links from the crawled site
+    list<string> mergeLinks;        // list of all the links from one crawled site
+    links.push_back(url);
+    for (int i = 0; i < level; i++)
     {
-        cout << "Crawling: " << url << endl;
-        Linkstorer storer (url, parent);
-        allURL.push_back(url);
-        storer.printLink();
-        parent = url;
-        links = storer.getLinks();
-    }    
+        while (!links.empty())
+        {
+            url = links.front();
+            links.pop_front();
+            if (find(allURL.begin(), allURL.end(), url) == allURL.end())
+            {
+                cout << "Crawling: " << url << endl;
+                Linkstorer storer (url);
+                allURL.push_back(url);
+                storer.printLink();
+                mergeLinks = storer.getLinks();
+                tempLinks.splice(tempLinks.begin(), mergeLinks);
+            }
+        }
+        links = tempLinks;
+    }
+
+
+
+
+
+
+
+       
 }
 
 

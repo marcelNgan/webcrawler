@@ -18,11 +18,6 @@ void Linkstorer::printLink()
         crawlFile.open("crawl.txt", ios::app);
         cout << "Written to crawl.txt" << endl;
         crawlFile << "URL: " << url << endl;
-        if (parentURL == "NULL")
-            crawlFile << "Parent: no parent" << endl;
-        else
-            crawlFile << "Parent: " << parentURL << endl;
-        
         crawlFile << "There are " << links.size() << " links:"  << endl;
  
         // iterate the links list
@@ -38,9 +33,8 @@ list<string> Linkstorer::getLinks()
     return links;
 }
 
-Linkstorer::Linkstorer(string s, string p)
+Linkstorer::Linkstorer(string s)
 {
-    parentURL = p;
     url = s;
     links = extractor(url);
 }
